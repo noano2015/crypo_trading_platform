@@ -1,111 +1,69 @@
+/**
+ * @file menu.cpp
+ * @author Pedro Vicente
+ * @brief The main program for the crypo_trading_platform
+ * @date 2025-07-16
+ *
+ * @copyright Copyright (c) 2025
+ *
+ */
+
 #include <iostream>
-#include <map>
+#include <string>
+#include <vector>
+#include <limits>
+#include "OrderBookEntry.h"
+#include "MerkelMain.h"
 
 
-/**
- * @brief Prints the main menu of the crypto trading platform
- * 
- */
-void printMenu(){
-    std::cout << "=====Menu=====" << std::endl;
-    std::cout << "1: Print help" << std::endl;
-    std::cout << "2: Print exchange stats" << std::endl;
-    std::cout << "3: Place an ask" << std::endl;
-    std::cout << "4: Place a bid" << std::endl;
-    std::cout << "5: Print wallet" << std::endl;
-    std::cout << "6: Continue" << std::endl;
-    std::cout << "==============" <<std::endl;
+double computeAveragePrice(std::vector<OrderBookEntry> &entries)
+{
+
+    double sum = 0;
+    for (OrderBookEntry &entry : entries)
+        sum += entry.price;
+    return sum / entries.size();
 }
 
-/**
- * @brief Gets the option from the user
- * 
- * @return int 
- */
-int getUserOption(){
-
-    int userOption;
-    std::cout << "Type in 1-6:" << std::endl;
-    std::cin >> userOption;
-    return userOption;
+double computeLowPrice(std::vector<OrderBookEntry> &entries)
+{
+    double min = std::numeric_limits<double>::max();
+    for (OrderBookEntry &entry : entries)
+        min = (min > entry.price) ? entry.price : min;
+    return min;
 }
 
-void printHelp(){
-    std::cout << "Help - your aim is to make money." << std::endl;
-    std::cout << "Analyse the market and make bids" << std::endl;
-    std::cout << "and offers. " << std::endl;
+double computeHighPrice(std::vector<OrderBookEntry> &entries)
+{
+    double max = std::numeric_limits<double>::lowest();
+    for (OrderBookEntry &entry : entries)
+        max = (max < entry.price) ? entry.price : max;
+    return max;
 }
 
-void printMarketBids(){
-    std::cout << "Exchange stats. Showing the latest market data..." <<std::endl;
-}
+double computePriceSpread(std::vector<OrderBookEntry> &entries)
+{
+    double highestBid = std::numeric_limits<double>::lowest();
+    double lowestAsk = std::numeric_limits<double>::max();
 
-void enterAsk(){
-    std::cout << "Ask. Ask about a bid..." << std::endl;
-}
+    for (OrderBookEntry &entry : entries)
+    {
 
-void enterBid(){
-    std::cout << "Bid. Place your Bid..." << std::endl;
-}
+        if (entry.type == OrderBookType::ask)
+            lowestAsk = (lowestAsk > entry.price) ? entry.price : lowestAsk;
 
-void printWallet(){
-    std::cout << "Wallet. Showing your Wallet..." << std::endl;
-}
-
-void gotoNextTimeframe(){
-    std::cout << "The operation was successful." <<std::endl;
-}
-
-
-/**
- * @brief Processes the option inserted by the user
- * 
- * @param userOption 
- */
-void processUserOption(int userOption){
-
-    switch (userOption){
-            
-        case 1:
-            printHelp();
-            break;
-            
-        case 2:
-            printMarketBids();
-            break;
-
-        case 3:
-            enterAsk();
-            break;
-
-        case 4:
-            enterBid();
-            break;
-
-        case 5:
-            printWallet();
-            break;
-
-        case 6:
-            gotoNextTimeframe();
-            break;
-
-        default:
-            std::cout<< "Invalid operation." <<std::endl;
-            break;
+        if (entry.type == OrderBookType::bid)
+            highestBid = highestBid = (highestBid < entry.price) ? entry.price : highestBid;
     }
-    
+
+    return lowestAsk - highestBid;
 }
 
-int main(){
+int main()
+{
 
-    while(true){
+    MerkelMain app{};
+    app.init();
 
-        printMenu();
-        int userOption = getUserOption();
-        processUserOption(userOption);
-        
-    }
     return 0;
 }
-
