@@ -36,3 +36,32 @@ OrderBookType OrderBookEntry::stringToOrderBookType(std::string s){
  * @return double 
  */
 double OrderBookEntry::getPrice(){ return price; }
+
+
+/**
+ * @brief 
+ * 
+ * @return double 
+ */
+double OrderBookEntry::getAmount(){ return amount; }
+
+/**
+ * @brief 
+ * 
+ * @return OrderBookType 
+ */
+OrderBookType OrderBookEntry::getType(){return type;}
+
+/**
+ * @brief 
+ * 
+ * @return std::string 
+ */
+std::string OrderBookEntry::getTimestamp(){return timestamp;}
+
+/**
+ * @brief 
+ * 
+ * @return std::string 
+ */
+std::string OrderBookEntry::getProduct(){ return product;}

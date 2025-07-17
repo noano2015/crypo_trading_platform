@@ -19,7 +19,12 @@ class OrderBookEntry{
         
         static OrderBookType stringToOrderBookType(std::string s);
         double getPrice();
+        double getAmount();
+        OrderBookType getType();
+        std::string getTimestamp();
+        std::string getProduct();
     
+    private:
         std::string timestamp;
         std::string product;
         OrderBookType type;

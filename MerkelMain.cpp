@@ -6,7 +6,7 @@
 
 void MerkelMain::init(){
 
-    loadOrderBook();
+    currentTime = orderBook.getEarliestTime();
     int input = 0;
     while(true){
 
@@ -17,11 +17,7 @@ void MerkelMain::init(){
     }
 }
 
-/** load up some dummy data for now */
-void MerkelMain::loadOrderBook(){
-    orders = CSVReader::readCSV("20200317.csv");
-    std::cout << "read " << orders.size() << " orders" << std::endl;
-}
+
 
 /**
  * @brief Prints the main menu of the crypto trading platform
@@ -58,16 +54,15 @@ void MerkelMain::printHelp(){
 }
 
 void MerkelMain::printMarketBids(){
-    std::cout << "read " << orders.size() << " orders" << std::endl;
-    unsigned int asks = 0;
-    unsigned int bids = 0;
-    
-    for(OrderBookEntry& entry : orders){
-        if(entry.type == OrderBookType::ask) ++asks;
-        if(entry.type == OrderBookType::bid) ++bids;
-    }
+   
+    for (const std::string& p : orderBook.getKnownProducts()){
 
-    std::cout << "Current market: " << std::endl <<"Asks: " << orders.size() << " Bids: "<< bids << std::endl;
+        std::cout << "Product: " << p << std::endl;
+        std::vector<OrderBookEntry> entries = orderBook.getOrders(OrderBookType::ask, p, currentTime);
+        std::cout << "Asks seen: " << entries.size() << std::endl;
+        std::cout << "Max ask: " << OrderBook::getHighPrice(entries) << std::endl;
+        std::cout << "Min ask: " << OrderBook::getLowPrice(entries) << std::endl;
+    }
 }
 
 void MerkelMain::enterAsk(){
@@ -83,7 +78,8 @@ void MerkelMain::printWallet(){
 }
 
 void MerkelMain::gotoNextTimeframe(){
-    std::cout << "The operation was successful." <<std::endl;
+    std::cout << "Going to next time frame. " << std::endl;
+    currentTime = orderBook.getNextTime(currentTime);
 }
 
 
