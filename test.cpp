@@ -1,70 +1,43 @@
-#include <iostream>
-#include <vector>
 #include <string>
-#include <fstream>
-#include "CSVReader.h"
-
-
-/** function implementation */
-std::vector<std::string> CSVReader::tokenise(std::string csvLine, char separator){
-
-    std::vector<std::string> tokens;
-
-    int start = 0, end = 0;
-    std::string token;
-
-    start = csvLine.find_first_not_of(separator, 0);
-    do{
-        end = csvLine.find_first_of(separator,start);
-
-        if(start == csvLine.length() || start == end) break;
-        if(end >= 0) token = csvLine.substr(start, end - start);
-        else token = csvLine.substr(start, csvLine.length() - start);
-
-        tokens.push_back(token);
-        start = end + 1;
-    } while(end != std::string::npos);
-
-    return tokens;
-}
-
-enum class OrderBookType{bid, ask};
+#include <iostream>
 
 int main(){
-    std::string csvFilename{"20200317.csv"};
-    std::ifstream csvFile{csvFilename};
-    std::string line;
-    int count = 0;
+    std::string currentTimestamp{"2020/03/17 17:01:24.884492"};
+    int year = std::stoi(currentTimestamp.substr(0, 4));
+    int month = std::stoi(currentTimestamp.substr(5, 2));
+    int day = std::stoi(currentTimestamp.substr(8, 2));
 
-    if (csvFile.is_open()){
-        std::cout << "Opened file " << csvFilename << std::endl;
-        std::string line;
-        while(getline(csvFile, line)){
-            std::vector<std::string> tokens = tokenise(line, ',');
-            std::cout << "Read " << tokens.size() << " tokens " << std::endl;
-            if (tokens.size() != 5) continue;
-            
-            std::string timestamp = tokens[0];
-            std::string product = tokens[1];
-            OrderBookType type = (tokens[2] == "ask")? OrderBookType::ask:OrderBookType::bid;
+    std::cout << year << std::endl;
+    std::cout << month << std::endl;
+    std::cout << day << std::endl;
 
-            try{
-                double price = std::stod(tokens[3]);
-                double amount = std::stod(tokens[4]);
+    int daysToSubtract = 25 * 7;
+    while (daysToSubtract > 0) {
+        day--;
+        if (day == 0) {
+            month--;
+            if (month == 0) {
+                month = 12;
+                year--;
             }
-            catch(const std::exception& e){
-                continue;
-            }
-            ++count;
-
-        }   
+            // Days in month
+            static const int daysInMonth[13] = {0,31,28,31,30,31,30,31,31,30,31,30,31};
+            bool leap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+            day = daysInMonth[month];
+            if (month == 2 && leap) day = 29;
+        }
+        daysToSubtract--;
     }
-    else{
-        std::cout << "Problem opening file " << csvFilename << std::endl;
-    }
+    std::cout << "====" << std::endl;
+    std::cout << year << std::endl;
+    std::cout << month << std::endl;
+    std::cout << day << std::endl;
 
-    std::cout << count << " lines were read." << std::endl;
-    // don't forget to close it!
-    csvFile.close();
-    return 0;
+    std::string pastTimestamp{  std::to_string(year)+"/"
+                                +std::to_string(month) +"/"
+                                +std::to_string(day) + 
+                                currentTimestamp.substr(10, currentTimestamp.size()-10)};
+
+    std::cout << pastTimestamp << std::endl;
+    
 }

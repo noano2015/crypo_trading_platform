@@ -10,7 +10,7 @@ std::vector<OrderBookEntry> CSVReader::readCSV(const std::string& csvFilename){
 
     std::vector<OrderBookEntry> entries;
 
-    std::ifstream csvFile{"20200317.csv"};
+    std::ifstream csvFile{csvFilename};
     std::string line;
 
     if(csvFile.is_open()){

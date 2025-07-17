@@ -55,13 +55,15 @@ void MerkelMain::printHelp(){
 
 void MerkelMain::printMarketBids(){
    
-    for (const std::string& p : orderBook.getKnownProducts()){
-
-        std::cout << "Product: " << p << std::endl;
-        std::vector<OrderBookEntry> entries = orderBook.getOrders(OrderBookType::ask, p, currentTime);
-        std::cout << "Asks seen: " << entries.size() << std::endl;
-        std::cout << "Max ask: " << OrderBook::getHighPrice(entries) << std::endl;
-        std::cout << "Min ask: " << OrderBook::getLowPrice(entries) << std::endl;
+    for (const std::string& product : orderBook.getKnownProducts()){
+        std::vector<OrderBookEntry> allEntries = orderBook.getAllOrders();
+        std::cout << "Product: " << product << std::endl;
+        std::cout << "24h Change: " << orderBook.change24Hours(allEntries, currentTime, product) << std::endl;
+        std::cout << "24h High: " << orderBook.high24Hours(allEntries, currentTime, product) << std::endl;
+        std::cout << "24h Low: " << orderBook.low24Hours(allEntries, currentTime, product) << std::endl;
+        std::cout << "7 Week Average: " << orderBook.averageWeeks(allEntries, 7, currentTime, product) << std::endl;
+        std::cout << "25 Week Average: " << orderBook.averageWeeks(allEntries, 25, currentTime, product) << std::endl;
+        std::cout << "99 Week Average: " << orderBook.averageWeeks(allEntries, 99, currentTime, product) << std::endl;
     }
 }
 
@@ -78,8 +80,9 @@ void MerkelMain::printWallet(){
 }
 
 void MerkelMain::gotoNextTimeframe(){
-    std::cout << "Going to next time frame. " << std::endl;
+    std::cout << "Going to next time frame. "  << "." << std::endl;
     currentTime = orderBook.getNextTime(currentTime);
+    std::cout << "Current time: " << currentTime << "." << std::endl;
 }
 
 
