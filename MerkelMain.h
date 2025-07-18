@@ -2,6 +2,7 @@
 #define __MERKEL_MAIN_H__
 #include <vector>
 #include "OrderBook.h"
+#include "Wallet.h"
 
 class MerkelMain{
 
@@ -21,8 +22,9 @@ class MerkelMain{
         void processUserOption(int userOption);
 
 
-        OrderBook orderBook{"test.csv"};
+        OrderBook orderBook{"20200317.csv"};
         std::string currentTime{""};
+        Wallet wallet;
 };
 
 

@@ -6,6 +6,8 @@
 void MerkelMain::init(){
 
     currentTime = orderBook.getEarliestTime();
+    std::cout << "Current Time: " << currentTime << std::endl;
+    wallet.insertCurrency("BTC", 10);
     int input = 0;
     while(true){
 
@@ -85,9 +87,17 @@ void MerkelMain::enterAsk(){
                                             tokens[0],
                                             OrderBookType::ask, 
                                             tokens[1],
-                                            tokens[2]
+                                            tokens[2],
+                                            "simuser"
                                             );
-            orderBook.insertOrder(obe);
+
+            if (wallet.canFulfillOrder(obe)){
+                std::cout << "Wallet looks good. " << std::endl;
+                orderBook.insertOrder(obe);
+            }
+            else {
+                std::cout << "Wallet has insufficient funds . " << std::endl;
+            }
         
         } catch (std::exception& e){
             std::cout << "MerkelMain::enterAsk: Bad Input! You put invalid arguments." << std::endl;
@@ -111,9 +121,17 @@ void MerkelMain::enterBid(){
                                             tokens[0],
                                             OrderBookType::bid, 
                                             tokens[1],
-                                            tokens[2]
+                                            tokens[2],
+                                            "simuser"
                                             );
-            orderBook.insertOrder(obe);
+
+            if (wallet.canFulfillOrder(obe)){
+                std::cout << "Wallet looks good. " << std::endl;
+                orderBook.insertOrder(obe);
+            }
+            else {
+                std::cout << "Wallet has insufficient funds . " << std::endl;
+            }
         
         } catch (std::exception& e){
             std::cout << "MerkelMain::enterBid: Bad Input! You put invalid arguments." << std::endl;
@@ -122,7 +140,7 @@ void MerkelMain::enterBid(){
 }
 
 void MerkelMain::printWallet(){
-    std::cout << "Wallet. Showing your Wallet..." << std::endl;
+    std::cout << wallet << std::endl;
 }
 
 void MerkelMain::gotoNextTimeframe(){
@@ -134,9 +152,14 @@ void MerkelMain::gotoNextTimeframe(){
         std::cout << "Sales: " << sales.size() << std::endl;
         for (OrderBookEntry& sale : sales){
             std::cout << "Sale price: " << sale.getPrice() << " amount " << sale.getAmount() << std::endl;
+            if(sale.getUsername() == "simuser"){
+                wallet.processSale(sale);
+                std::cout << "VENDIDO!" << std::endl;
+            }
         }
     }
     currentTime = orderBook.getNextTime(currentTime);
+    std::cout << "Current Time: " << currentTime << std::endl;
 }
 
 

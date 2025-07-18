@@ -7,6 +7,7 @@
 #include <vector>
 #include <set>
 #include <algorithm>
+#include <iostream>
 
 /** construct, reading a csv data file */
 OrderBook::OrderBook(std::string filename){
@@ -98,17 +99,45 @@ std::vector<OrderBookEntry> OrderBook::matchAsksToBids(std::string product, std:
     std::vector<OrderBookEntry> asks = getOrders(OrderBookType::ask, product, timestamp);
     std::vector<OrderBookEntry> bids = getOrders(OrderBookType::bid, product, timestamp);
 
+    if (asks.size() == 0 || bids.size() == 0){
+        std::cout << " OrderBook::matchAsksToBids no bids or asks" << std::endl;
+        return sales;
+    }
+
+    // sort asks lowest first
+    std::sort(asks.begin(), asks.end(), OrderBookEntry::compareByPriceAsc);
+    // sort bids highest first
+    std::sort(bids.begin(), bids.end(), OrderBookEntry::compareByPriceDesc);
+    // for ask in asks:
+    std::cout << "max ask " << asks[asks.size()-1].getPrice() << std::endl;
+    std::cout << "min ask " << asks[0].getPrice() << std::endl;
+    std::cout << "max bid " << bids[0].getPrice() << std::endl;
+    std::cout << "min bid " << bids[bids.size()-1].getPrice() << std::endl;
+
     for(OrderBookEntry& ask : asks){
         
         for(OrderBookEntry& bid : bids){
             
-            OrderBookEntry sale{timestamp,
+        
+            if( bid.getPrice() >= ask.getPrice()){
+
+                OrderBookEntry sale{timestamp,
                                 product,
-                                OrderBookType::sale,
+                                OrderBookType::asksale,
                                 ask.getPrice(),
                                 0};
-            
-            if( bid.getPrice() >= ask.getPrice()){
+
+                if (bid.getUsername()== "simuser"){
+
+                    sale.setUsername("simuser");
+                    sale.setType(OrderBookType::bidsale);
+                }
+                if (ask.getUsername() == "simuser"){
+                    
+                    sale.setUsername("simuser");
+                    sale.setType(OrderBookType::asksale);
+                }
+
                 if(ask.getAmount() == bid.getAmount()){
 
                     sale.setAmount(ask.getAmount());
@@ -117,14 +146,15 @@ std::vector<OrderBookEntry> OrderBook::matchAsksToBids(std::string product, std:
                     break;
                 }
 
-                else if(ask.getAmount() < bid.getAmount()){
+                if(ask.getAmount() < bid.getAmount()){
                     sale.setAmount(ask.getAmount());
                     sales.push_back(sale);
                     bid.setAmount(bid.getAmount()- ask.getAmount());
                     break;
                 }
 
-                else{
+                if(bid.getAmount() < ask.getAmount() && 
+                   bid.getAmount() > 0){
                     sale.setAmount(bid.getAmount());
                     sales.push_back(sale);
                     ask.setAmount(ask.getAmount() - bid.getAmount());

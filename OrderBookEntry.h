@@ -3,7 +3,7 @@
 
 #include <string>
 
-enum class OrderBookType{bid, ask, sale, unknown};
+enum class OrderBookType{bid, ask, unknown, asksale, bidsale};
 
 class OrderBookEntry{
 
@@ -14,7 +14,8 @@ class OrderBookEntry{
             std::string _product,
             OrderBookType _type,
             double _price,
-            double _amount
+            double _amount,
+            std::string _username = "dataset"
         );
         
         static OrderBookType stringToOrderBookType(std::string s);
@@ -23,7 +24,11 @@ class OrderBookEntry{
         OrderBookType getType();
         std::string getTimestamp();
         std::string getProduct();
-        void setAmount(double amount );
+        std::string getUsername();
+        void setPrice(double _price);
+        void setAmount(double _amount );
+        void setType(OrderBookType _orderType);
+        void setUsername(std::string _username);
 
         static bool compareByTimestamp(const OrderBookEntry& e1, const OrderBookEntry& e2){
             return e1.timestamp < e2.timestamp;
@@ -43,6 +48,7 @@ class OrderBookEntry{
         OrderBookType type;
         double price; 
         double amount;
+        std::string username;
 
 };
 

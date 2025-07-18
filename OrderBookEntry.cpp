@@ -15,13 +15,16 @@ OrderBookEntry::OrderBookEntry(
     std::string _product,
     OrderBookType _type,
     double _price,
-    double _amount)
+    double _amount,
+    std::string _username)
 : 
 timestamp(_timestamp),
 product(_product),
 type(_type),
 price(_price),
-amount(_amount) {}
+amount(_amount),
+username(_username)
+{}
 
 
 OrderBookType OrderBookEntry::stringToOrderBookType(std::string s){
@@ -66,4 +69,12 @@ std::string OrderBookEntry::getTimestamp(){return timestamp;}
  */
 std::string OrderBookEntry::getProduct(){ return product;}
 
+std::string OrderBookEntry::getUsername(){ return username;}
+
+void OrderBookEntry::setPrice(double _price){ price = _price; }
+
 void OrderBookEntry::setAmount(double _amount){ amount = _amount; }
+
+void OrderBookEntry::setType(OrderBookType _orderType){ type = _orderType;}
+
+void OrderBookEntry::setUsername(std::string _username){ username = _username;}
