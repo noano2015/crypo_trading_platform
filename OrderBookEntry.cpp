@@ -65,3 +65,5 @@ std::string OrderBookEntry::getTimestamp(){return timestamp;}
  * @return std::string 
  */
 std::string OrderBookEntry::getProduct(){ return product;}
+
+void OrderBookEntry::setAmount(double _amount){ amount = _amount; }

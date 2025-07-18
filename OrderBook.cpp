@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <algorithm>
 
 /** construct, reading a csv data file */
 OrderBook::OrderBook(std::string filename){
@@ -26,10 +27,6 @@ std::vector<std::string> OrderBook::getKnownProducts(){
     }
 
     return products;
-}
-
-std::vector<OrderBookEntry> OrderBook::getAllOrders(){
-    return orders;
 }
 
 /** return vector of Orders according to the sent filters*/
@@ -73,118 +70,69 @@ std::string OrderBook::getNextTime(const std::string& timestamp){
     return next_timestamp;
 }
 
-std::string OrderBook::obtainPastTimestamp(std::string timestamp, int days){
-    // Obtain the past timestamp
-    int year = std::stoi(timestamp.substr(0, 4));
-    int month = std::stoi(timestamp.substr(5, 2));
-    int day = std::stoi(timestamp.substr(8, 2));
-
-    while (days > 0) {
-        day--;
-        if (day == 0) {
-            month--;
-            if (month == 0) {
-                month = 12;
-                year--;
-            }
-            // Days in month
-            static const int daysInMonth[13] = {0,31,28,31,30,31,30,31,31,30,31,30,31};
-            bool leap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
-            day = daysInMonth[month];
-            if (month == 2 && leap) day = 29;
-        }
-        days--;
-    }
-
-    return  std::to_string(year)+"/"
-            +std::to_string(month) +"/"
-            +std::to_string(day) + 
-            timestamp.substr(10, timestamp.size()-10);
-}
-
-
-/// @brief Computes the avrege of the past n weeks
-/// @param orders vector of Entries
-/// @param n_weeks number of weeks of the average
-/// @param currentTimestamp current time stamp of the simulation
-/// @param product string that corresponds to a specific type of product
-/// @return the average of the price of all entries based on the number of weeks
-double OrderBook::averageWeeks( std::vector<OrderBookEntry>& orders, 
-                                int n_weeks, 
-                                std::string currentTimestamp,
-                                std::string product){
-
-    std::string pastTimestamp{obtainPastTimestamp(currentTimestamp, n_weeks*7)};
-    
-    // Calculate the average of the price of all entries
-    double sum = 0;
-    double n_entries = 0;
-
-    for(OrderBookEntry& order : orders){
-        if( order.getTimestamp() >= pastTimestamp && 
-            order.getTimestamp() <=currentTimestamp && 
-            order.getProduct() == product){
-            sum+=order.getPrice();
-            ++n_entries;
-        }
-    }
-    return sum/n_entries;
-}
-
-double OrderBook::change24Hours(    std::vector<OrderBookEntry>& orders,
-                                    std::string current,
-                                    std::string product){
-
-    std::string pastTimestamp = obtainPastTimestamp(current, 1);
-    double yesterdayPrice = 0, todaysPrice = 0;
-    bool fisrtSeen = true;
-    for(OrderBookEntry& entry : orders){
-        if( entry.getTimestamp() >= pastTimestamp &&
-            entry.getProduct()==product &&
-            fisrtSeen){
-            yesterdayPrice = entry.getPrice();
-            fisrtSeen = !fisrtSeen;
-        }
-        if(entry.getTimestamp() <= current)
-            todaysPrice = entry.getPrice();
-        else
-            break;
-    }
-
-    return todaysPrice - yesterdayPrice;
-}
-
-double OrderBook::high24Hours(  std::vector<OrderBookEntry>& orders,
-                                std::string current,
-                                std::string product){
-
-    std::string pastTimespam{obtainPastTimestamp(current, 1)};
-
+/** return the price of the highest bid in the sent set */
+double OrderBook::getHighPrice(std::vector<OrderBookEntry>& orders){
     double max = std::numeric_limits<double>::lowest();
     for(OrderBookEntry& entry : orders){
-        if( entry.getTimestamp() >= pastTimespam &&
-            entry.getTimestamp() <= current &&
-            entry.getProduct() == product){
-            if(max < entry.getPrice()) max = entry.getPrice();
-        }
-        if(entry.getTimestamp() > current) break; 
+        if(max < entry.getPrice()) max = entry.getPrice(); 
     }
     return max;
 }
 
-double OrderBook::low24Hours(   std::vector<OrderBookEntry>& orders,
-                                std::string current,
-                                std::string product){
-    std::string pastTimespam{obtainPastTimestamp(current, 1)};
+/** return the price of the lowest bid in the sent set */
+double OrderBook::getLowPrice(std::vector<OrderBookEntry>& orders){
     double min = std::numeric_limits<double>::max();
     for(OrderBookEntry& entry : orders){
-        if( entry.getTimestamp() >= pastTimespam &&
-            entry.getTimestamp() <= current &&
-            entry.getProduct() == product){
-            if(min > entry.getPrice()) min = entry.getPrice(); 
-        }
-        if(entry.getTimestamp() > current) break; 
+        if(min > entry.getPrice()) min = entry.getPrice(); 
     }
     return min;
+}
 
+void OrderBook::insertOrder(OrderBookEntry& order){
+    orders.push_back(order);
+    std::sort(orders.begin(), orders.end(), OrderBookEntry::compareByTimestamp);
+}
+
+std::vector<OrderBookEntry> OrderBook::matchAsksToBids(std::string product, std::string timestamp){
+    std::vector<OrderBookEntry> sales;
+    std::vector<OrderBookEntry> asks = getOrders(OrderBookType::ask, product, timestamp);
+    std::vector<OrderBookEntry> bids = getOrders(OrderBookType::bid, product, timestamp);
+
+    for(OrderBookEntry& ask : asks){
+        
+        for(OrderBookEntry& bid : bids){
+            
+            OrderBookEntry sale{timestamp,
+                                product,
+                                OrderBookType::sale,
+                                ask.getPrice(),
+                                0};
+            
+            if( bid.getPrice() >= ask.getPrice()){
+                if(ask.getAmount() == bid.getAmount()){
+
+                    sale.setAmount(ask.getAmount());
+                    sales.push_back(sale);
+                    bid.setAmount(0);
+                    break;
+                }
+
+                else if(ask.getAmount() < bid.getAmount()){
+                    sale.setAmount(ask.getAmount());
+                    sales.push_back(sale);
+                    bid.setAmount(bid.getAmount()- ask.getAmount());
+                    break;
+                }
+
+                else{
+                    sale.setAmount(bid.getAmount());
+                    sales.push_back(sale);
+                    ask.setAmount(ask.getAmount() - bid.getAmount());
+                    bid.setAmount(0);
+                    continue;
+                }
+            }
+        }
+    }
+    return sales;
 }

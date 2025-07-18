@@ -12,7 +12,6 @@ class MerkelMain{
     private:
         void printMenu();
         int getUserOption();
-        void loadOrderBook();
         void printHelp();
         void printMarketBids();
         void enterAsk();
@@ -22,7 +21,7 @@ class MerkelMain{
         void processUserOption(int userOption);
 
 
-        OrderBook orderBook{"crypto_data.csv"};
+        OrderBook orderBook{"test.csv"};
         std::string currentTime{""};
 };
 

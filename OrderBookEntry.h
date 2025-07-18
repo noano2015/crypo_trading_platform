@@ -3,7 +3,7 @@
 
 #include <string>
 
-enum class OrderBookType{bid, ask, unknown};
+enum class OrderBookType{bid, ask, sale, unknown};
 
 class OrderBookEntry{
 
@@ -23,6 +23,19 @@ class OrderBookEntry{
         OrderBookType getType();
         std::string getTimestamp();
         std::string getProduct();
+        void setAmount(double amount );
+
+        static bool compareByTimestamp(const OrderBookEntry& e1, const OrderBookEntry& e2){
+            return e1.timestamp < e2.timestamp;
+        }
+
+        static bool compareByPriceAsc(OrderBookEntry& e1, OrderBookEntry& e2){
+            return e1.price < e2.price;
+        }
+
+        static bool compareByPriceDesc(OrderBookEntry& e1, OrderBookEntry& e2){
+            return e1.price > e2.price;
+        }
     
     private:
         std::string timestamp;

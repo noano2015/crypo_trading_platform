@@ -1,8 +1,7 @@
 #include "MerkelMain.h"
 #include <iostream>
 #include "CSVReader.h"
-
-
+#include "OrderBook.h"
 
 void MerkelMain::init(){
 
@@ -40,10 +39,16 @@ void MerkelMain::printMenu(){
  * @return int 
  */
 int MerkelMain::getUserOption(){
+    int userOption = 0;
+    std::string line;
+    std::cout << "Type in 1-6" << std::endl;
+    std::getline(std::cin, line);
+    try{
+        userOption = std::stoi(line);
 
-    int userOption;
-    std::cout << "Type in 1-6:" << std::endl;
-    std::cin >> userOption;
+    } catch(const std::exception& e){}
+
+    std::cout << "You chose: " << userOption << std::endl;
     return userOption;
 }
 
@@ -56,23 +61,64 @@ void MerkelMain::printHelp(){
 void MerkelMain::printMarketBids(){
    
     for (const std::string& product : orderBook.getKnownProducts()){
-        std::vector<OrderBookEntry> allEntries = orderBook.getAllOrders();
         std::cout << "Product: " << product << std::endl;
-        std::cout << "24h Change: " << orderBook.change24Hours(allEntries, currentTime, product) << std::endl;
-        std::cout << "24h High: " << orderBook.high24Hours(allEntries, currentTime, product) << std::endl;
-        std::cout << "24h Low: " << orderBook.low24Hours(allEntries, currentTime, product) << std::endl;
-        std::cout << "7 Week Average: " << orderBook.averageWeeks(allEntries, 7, currentTime, product) << std::endl;
-        std::cout << "25 Week Average: " << orderBook.averageWeeks(allEntries, 25, currentTime, product) << std::endl;
-        std::cout << "99 Week Average: " << orderBook.averageWeeks(allEntries, 99, currentTime, product) << std::endl;
+        std::vector<OrderBookEntry> entries = orderBook.getOrders(OrderBookType::ask, product, currentTime);
+        std::cout << "Asks seen: " << entries.size() << std::endl;
+        std::cout << "Max ask: " << OrderBook::getHighPrice(entries) << std::endl;
+        std::cout << "Min ask: " << OrderBook::getLowPrice(entries) << std::endl;
+        
     }
 }
 
 void MerkelMain::enterAsk(){
-    std::cout << "Ask. Ask about a bid..." << std::endl;
+    std::cout << "Make an ask - enter the amount: product,price, amount, eg ETH/BTC,200,0.5" << std::endl;
+    std::string input;
+    std::getline(std::cin, input);
+    std::vector<std::string> tokens = CSVReader::tokenise(input, ',');
+
+    if(tokens.size() != 3){
+        std::cout << "MerkelMain::enterAsk: Bad Input! You didn't put enough arguments." << std::endl;
+    }else{
+        try{
+            OrderBookEntry obe = CSVReader::stringsToOBE(   
+                                            currentTime,
+                                            tokens[0],
+                                            OrderBookType::ask, 
+                                            tokens[1],
+                                            tokens[2]
+                                            );
+            orderBook.insertOrder(obe);
+        
+        } catch (std::exception& e){
+            std::cout << "MerkelMain::enterAsk: Bad Input! You put invalid arguments." << std::endl;
+        }
+    }
+
 }
 
 void MerkelMain::enterBid(){
-    std::cout << "Bid. Place your Bid..." << std::endl;
+    std::cout << "Make an bid - enter the amount: product,price, amount, eg ETH/BTC,200,0.5" << std::endl;
+    std::string input;
+    std::getline(std::cin, input);
+    std::vector<std::string> tokens = CSVReader::tokenise(input, ',');
+
+    if(tokens.size() != 3){
+        std::cout << "MerkelMain::enterBid: Bad Input! You didn't put enough arguments." << std::endl;
+    }else{
+        try{
+            OrderBookEntry obe = CSVReader::stringsToOBE(   
+                                            currentTime,
+                                            tokens[0],
+                                            OrderBookType::bid, 
+                                            tokens[1],
+                                            tokens[2]
+                                            );
+            orderBook.insertOrder(obe);
+        
+        } catch (std::exception& e){
+            std::cout << "MerkelMain::enterBid: Bad Input! You put invalid arguments." << std::endl;
+        }
+    }
 }
 
 void MerkelMain::printWallet(){
@@ -80,9 +126,17 @@ void MerkelMain::printWallet(){
 }
 
 void MerkelMain::gotoNextTimeframe(){
-    std::cout << "Going to next time frame. "  << "." << std::endl;
+    std::cout << "Going to next time frame. " << std::endl;
+    for (std::string& p : orderBook.getKnownProducts()){
+
+        std::cout << "matching " << p << std::endl;
+        std::vector<OrderBookEntry> sales = orderBook.matchAsksToBids(p, currentTime);
+        std::cout << "Sales: " << sales.size() << std::endl;
+        for (OrderBookEntry& sale : sales){
+            std::cout << "Sale price: " << sale.getPrice() << " amount " << sale.getAmount() << std::endl;
+        }
+    }
     currentTime = orderBook.getNextTime(currentTime);
-    std::cout << "Current time: " << currentTime << "." << std::endl;
 }
 
 
