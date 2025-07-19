@@ -8,10 +8,10 @@
  * 
  */
 
-#include "MerkelMain.h"
+#include "../headers/MerkelMain.h"
 #include <iostream>
-#include "CSVReader.h"
-#include "OrderBook.h"
+#include "../headers/CSVReader.h"
+#include "../headers/OrderBook.h"
 
 void MerkelMain::init(){
 
@@ -22,7 +22,7 @@ void MerkelMain::init(){
     while(true){
 
         printMenu();
-        int input = getUserOption();
+        input = getUserOption();
         if(input == 7) break;
         processUserOption(input);
         

@@ -8,7 +8,7 @@
  *
  */
 
-#include "CSVReader.h"
+#include "../headers/CSVReader.h"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -45,7 +45,7 @@ std::vector<std::string> CSVReader::tokenise(std::string& csvLine, char separato
 
     std::vector<std::string> tokens;
 
-    int start = 0, end = 0;
+    std::string::size_type start = 0, end = 0;
     std::string token;
 
     start = csvLine.find_first_not_of(separator, 0);

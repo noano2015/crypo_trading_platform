@@ -10,9 +10,9 @@
  * 
  */
 
-#include "Wallet.h"
+#include "../headers/Wallet.h"
 #include <vector>
-#include "CSVReader.h"
+#include "../headers/CSVReader.h"
 
 Wallet::Wallet(){}
 

@@ -8,7 +8,7 @@
  *
  */
 
-#include "MerkelMain.h"
+#include "../headers/MerkelMain.h"
 
 int main()
 {

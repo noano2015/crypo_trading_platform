@@ -57,7 +57,7 @@ class MerkelMain{
         void processUserOption(int userOption);
 
         /// @brief The book that contains all the crypto trading actions of the simulation.
-        OrderBook orderBook{"20200317.csv"};
+        OrderBook orderBook{"../data/20200317.csv"};
 
         /// @brief Saves the current simulation timestamp.
         std::string currentTime{""};
