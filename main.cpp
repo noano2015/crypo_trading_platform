@@ -1,5 +1,5 @@
 /**
- * @file menu.cpp
+ * @file main.cpp
  * @author Pedro Vicente
  * @brief The main program for the crypo_trading_platform
  * @date 2025-07-16
@@ -8,11 +8,6 @@
  *
  */
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <limits>
-#include "OrderBookEntry.h"
 #include "MerkelMain.h"
 
 int main()

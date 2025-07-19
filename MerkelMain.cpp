@@ -1,3 +1,13 @@
+/**
+ * @file MerkelMain.cpp
+ * @author Pedro Vicente
+ * @brief The core of all the features of the crypto trading simulation
+ * @date 2025-07-19
+ * 
+ * @copyright Copyright (c) 2025
+ * 
+ */
+
 #include "MerkelMain.h"
 #include <iostream>
 #include "CSVReader.h"
@@ -13,17 +23,13 @@ void MerkelMain::init(){
 
         printMenu();
         int input = getUserOption();
+        if(input == 7) break;
         processUserOption(input);
         
     }
 }
 
 
-
-/**
- * @brief Prints the main menu of the crypto trading platform
- * 
- */
 void MerkelMain::printMenu(){
     std::cout << "=====Menu=====" << std::endl;
     std::cout << "1: Print help" << std::endl;
@@ -32,14 +38,10 @@ void MerkelMain::printMenu(){
     std::cout << "4: Place a bid" << std::endl;
     std::cout << "5: Print wallet" << std::endl;
     std::cout << "6: Continue" << std::endl;
+    std::cout << "7: Exit" << std::endl;
     std::cout << "==============" <<std::endl;
 }
 
-/**
- * @brief Gets the option from the user
- * 
- * @return int 
- */
 int MerkelMain::getUserOption(){
     int userOption = 0;
     std::string line;
@@ -163,11 +165,6 @@ void MerkelMain::gotoNextTimeframe(){
 }
 
 
-/**
- * @brief Processes the option inserted by the user
- * 
- * @param userOption 
- */
 void MerkelMain::processUserOption(int userOption){
 
     switch (userOption){

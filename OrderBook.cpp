@@ -1,3 +1,13 @@
+/**
+ * @file OrderBook.cpp
+ * @author Pedro Vicente
+ * @brief A Collection that stores and manipulates all the entries 
+ * that were introduced since the beigining of the simulation
+ * @date 2025-07-19
+ * 
+ * @copyright Copyright (c) 2025
+ * 
+ */
 
 #include "OrderBook.h"
 #include "OrderBookEntry.h"

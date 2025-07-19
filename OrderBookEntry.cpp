@@ -1,3 +1,13 @@
+/**
+ * @file OrderBookEntry.cpp
+ * @author Pedro Vicente
+ * @brief An entry of the OrderBook that stores the information of a bid, a ask or a sale
+ * @date 2025-07-19
+ * 
+ * @copyright Copyright (c) 2025
+ * 
+ */
+
 #include "OrderBookEntry.h"
 #include <string>
 
@@ -30,43 +40,20 @@ username(_username)
 OrderBookType OrderBookEntry::stringToOrderBookType(std::string s){
     if(s == "ask") return OrderBookType::ask;
     if(s == "bid") return OrderBookType::bid;
+    if(s == "unknown") return OrderBookType::unknown;
+    if(s == "asksale") return OrderBookType::asksale;
+    if(s == "bidsale") return OrderBookType::bidsale;
     return OrderBookType::unknown;
 }
 
-/**
- * @brief Gets the price of the entry
- * 
- * @return double 
- */
 double OrderBookEntry::getPrice(){ return price; }
 
-
-/**
- * @brief 
- * 
- * @return double 
- */
 double OrderBookEntry::getAmount(){ return amount; }
 
-/**
- * @brief 
- * 
- * @return OrderBookType 
- */
 OrderBookType OrderBookEntry::getType(){return type;}
 
-/**
- * @brief 
- * 
- * @return std::string 
- */
 std::string OrderBookEntry::getTimestamp(){return timestamp;}
 
-/**
- * @brief 
- * 
- * @return std::string 
- */
 std::string OrderBookEntry::getProduct(){ return product;}
 
 std::string OrderBookEntry::getUsername(){ return username;}

@@ -1,3 +1,15 @@
+/**
+ * @file Wallet.cpp
+ * @author Pedro Vicente
+ * @brief The container in which all the crypto assets of the user
+ * are saved during the simulation.
+ * @version 0.1
+ * @date 2025-07-19
+ * 
+ * @copyright Copyright (c) 2025
+ * 
+ */
+
 #include "Wallet.h"
 #include <vector>
 #include "CSVReader.h"

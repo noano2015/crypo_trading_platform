@@ -1,8 +1,19 @@
+/**
+ * @file CSVReader.cpp
+ * @author Pedro Vicente
+ * @brief The class that allows to parse csv files
+ * @date 2025-07-16
+ *
+ * @copyright Copyright (c) 2025
+ *
+ */
+
 #include "CSVReader.h"
 #include <vector>
 #include <string>
 #include <iostream>
 #include <fstream>
+
 
 CSVReader::CSVReader(){}
 
